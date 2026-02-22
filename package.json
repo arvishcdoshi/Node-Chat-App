@@ -1,0 +1,26 @@
+{
+  "name": "node-chat-app",
+  "version": "1.0.0",
+  "description": "Chat app using Socket.IO",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arvishcdoshi/Node-Chat-App.git"
+  },
+  "author": "Arvish",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/arvishcdoshi/Node-Chat-App/issues"
+  },
+  "homepage": "https://github.com/arvishcdoshi/Node-Chat-App#readme",
+  "dependencies": {
+    "express": "^4.16.4"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.7"
+  }
+}
