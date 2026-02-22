@@ -1,0 +1,16 @@
+Create an explicit HTTP server from the Express app.
+//
+
+Technical explanation:
+ - `app` is a plain request handler function: `(req, res) => { ... }`.
+ - `http.createServer(app)` wraps that handler in an `http.Server` instance.
+ - We create the `http.Server` explicitly so we can attach a WebSocket server
+   (for example `ws` or `socket.io`) to the same underlying TCP listener/port.
+   WebSocket libraries either listen to the server's `upgrade` event or are
+   constructed with the server instance; both require direct access to the
+   `http.Server` object.
+ - `app.listen(...)` is a convenience shortcut that internally does
+   `http.createServer(app).listen(...)`. That shortcut does not expose the
+   server instance, making WS integration or low-level event handling harder. ( See index_old.js for the previous code.)
+ - Creating the server explicitly also allows graceful shutdown via
+   `server.close()` and setting server-level timeouts or socket options.

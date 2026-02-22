@@ -1,17 +1,42 @@
 const path = require('path')
+const http = require('http')
 const express = require('express')
+const socketio = require('socket.io')
 
 const app = express()
+
+// So all we've done is we've created the server
+// outside of the Express library, we're creating it ourself
+// and configuring it to use our Express app.
+// Then we are starting it up using server.listen.
+// Now, with this in place,
+// it's gonna be really easy to set up Socket.IO.
+
+
+const server = http.createServer(app)
+
+// Attach socket.io (or another WebSocket implementation) to the same server
+// so HTTP and WebSocket traffic share the same port and TCP socket.
+
+// This is why we did the refactoring above:
+// Socket.IO expects it to be called with the raw HTTP server instance, not the Express app.
+// we needed access to the server instance in order to attach Socket.IO to it.
+
+//  When express creates that behind the scenes, we don't have access to it to pass it in right here.
+const io = socketio(server)
+
+// READ NOTES.TXT first few lines for more info.
 
 const port = process.env.PORT || 3000
 const publicDirectoryPath = path.join(__dirname, '../public')
 
 app.use(express.static(publicDirectoryPath))
 
-app.get('/hello', (req, res) => {
-  res.send('Hello World!')
+// Fires when Socket.IO server receives a new connection
+io.on('connection', () => {
+  console.log('New WebSocket connection')
 })
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Example app listening on port ${port}!`)
 })
