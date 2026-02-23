@@ -32,9 +32,25 @@ const publicDirectoryPath = path.join(__dirname, '../public')
 
 app.use(express.static(publicDirectoryPath))
 
+let count = 0
+
+// server (emit) -> client (receive) - countUpdated
+// client (emit) -> server (receive) - increment
+
 // Fires when Socket.IO server receives a new connection
-io.on('connection', () => {
+io.on('connection', (socket) => {
   console.log('New WebSocket connection')
+
+  socket.emit('countUpdated',count)
+
+  socket.on('increment', () => {
+      count++
+    // socket.emit('countUpdated', count)
+    // We want to emit the countUpdated event to every single connection, not just the one that triggered the increment event.
+
+      // So instead of using socket.emit, we can use io.emit to emit an event to every single connection that is currently connected to our server.
+      io.emit('countUpdated', count)
+    })
 })
 
 server.listen(port, () => {
