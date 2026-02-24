@@ -36,16 +36,25 @@ app.use(express.static(publicDirectoryPath))
 // server (emit) -> client (receive) - countUpdated
 // client (emit) -> server (receive) - increment
 
-// Fires when Socket.IO server receives a new connection
+// Fires when Socket.IO server receives a new connection ( basically run some code when a new client connects to our server)
 io.on('connection', (socket) => {
   console.log('New WebSocket connection')
 
   socket.emit('message', 'Welcome!')
 
+ // socket.broadcast.emit emits an event to every single connection except for the one that triggered the event.
+  socket.broadcast.emit('message', 'A new user has joined!')
+
   socket.on('sendMessage', (message) => {
     // We want to broadcast this message to every single connection that is currently connected to our server.
     io.emit('message', message)
   })
+
+  // socket.on is used to listen for an event. So in this case, we are listening for the disconnect event, which is built into Socket.IO and it fires when a client disconnects from our server.
+  socket.on('disconnect', () => {
+    io.emit('message', 'A user has left!')
+  })
+
 
 
 //   socket.emit('countUpdated',count)
