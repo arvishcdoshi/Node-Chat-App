@@ -1,3 +1,4 @@
+```plaintext
 Create an explicit HTTP server from the Express app.
 //
 
@@ -14,3 +15,68 @@ Technical explanation:
    server instance, making WS integration or low-level event handling harder. ( See index_old.js for the previous code.)
  - Creating the server explicitly also allows graceful shutdown via
    `server.close()` and setting server-level timeouts or socket options.
+```
+
+Socket.IO notes (quick reference)
+--------------------------------
+
+- Connection lifecycle:
+  - `io.on('connection', socket) => { ... }` fires once per client connection and provides that client's `socket` instance.
+  - Per-client events (like `disconnect`) are emitted on the provided `socket` instance. Therefore you must register `socket.on('disconnect', ...)` inside the `io.on('connection', ...)` handler so the listener is bound to that particular client's socket.
+  - There is no global `io.on('disconnect', ...)` that receives the disconnects with a socket instance.
+
+- Typical server pattern:
+  ```js
+  io.on('connection', (socket) => {
+    console.log('New connection', socket.id)
+
+    socket.emit('message', 'Welcome!')
+
+    socket.on('sendMessage', (message) => {
+      // validate/log
+      io.emit('message', message) // broadcast to everyone
+    })
+
+    socket.on('disconnect', (reason) => {
+      console.log('Disconnected', socket.id, reason)
+      // cleanup shared state, notify others, etc.
+    })
+  })
+  ```
+
+- Client-side notes (form + send flow):
+  - HTML: ensure the form has an id and the input has a `name` attribute so `e.target.elements` works.
+    ```html
+    <form id="message-form">
+      <input id="message" name="message" autocomplete="off" />
+      <button type="submit">Send</button>
+    </form>
+    ```
+  - JS: listen for the form `submit` event, call `e.preventDefault()`, read `e.target.elements.message.value`, guard empty values, `socket.emit('sendMessage', message)`, then clear + focus the input.
+    ```js
+    document.querySelector('#message-form').addEventListener('submit', (e) => {
+      e.preventDefault()
+      const message = e.target.elements.message.value
+      if (!message) return
+      socket.emit('sendMessage', message)
+      e.target.elements.message.value = ''
+      e.target.elements.message.focus()
+    })
+    ```
+
+- Debugging tips:
+  - Check browser console for errors and that Socket.IO client script loads (`/socket.io/socket.io.js`).
+  - Check server logs for emitted messages (e.g. `Message received:` in `sendMessage` handler).
+  - Verify the server is running on expected port and the page is served from the same origin (or configure CORS/allow origins in Socket.IO).
+  - Add temporary `console.log` statements in both client and server to trace events.
+
+- Quick test commands:
+  ```bash
+  npm run dev
+  # open http://localhost:3000 in browser, open devtools, type message, click Send
+  ```
+
+- Next steps / ideas:
+  - Add user join/leave messages (broadcast on connect/disconnect).
+  - Add simple validation and rate-limiting for messages.
+  - Track connected users in a server-side map for presence.
