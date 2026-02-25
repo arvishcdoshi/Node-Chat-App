@@ -20,7 +20,17 @@ document.querySelector('#message-form').addEventListener('submit', (e) => {
   // used to prevent the default behavior of the form submission, which is when browser refreshes the full page.
   e.preventDefault()
   const message = e.target.elements.message.value
-  socket.emit('sendMessage', message)
+  socket.emit('sendMessage', message, (error) => {
+
+    // If there is an error, we want to log it to the console and return from this function. Otherwise, we want to log a success message to the console.
+    if (error) {
+      return console.log('Error:', error)
+    }
+
+    // This is the acknowledgement callback function that we are passing in as the third argument to socket.emit. So this function will be called when the server acknowledges that it has received the message.
+
+    console.log('Message delivered!')
+  })
 })
 
 document.querySelector('#send-location').addEventListener('click', () => {
@@ -36,6 +46,11 @@ document.querySelector('#send-location').addEventListener('click', () => {
         socket.emit('sendLocation', {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude
+        }, (error) => {
+            if (error) {
+                return console.log('Error:', error)
+            }
+            console.log('Location delivered!')
         })
     })
 })
