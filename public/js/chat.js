@@ -22,3 +22,20 @@ document.querySelector('#message-form').addEventListener('submit', (e) => {
   const message = e.target.elements.message.value
   socket.emit('sendMessage', message)
 })
+
+document.querySelector('#send-location').addEventListener('click', () => {
+    if (!navigator.geolocation) {
+        return alert('Geolocation is not supported by your browser.')
+    }
+
+    // getCurrentPosition is a method that is available on the navigator.geolocation object and it takes a callback function as an argument.
+    // This callback function will be called with the position object that contains the latitude and longitude of the user's current location.
+    // We can then emit this location data to the server using socket.emit
+
+    navigator.geolocation.getCurrentPosition((position) => {
+        socket.emit('sendLocation', {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+        })
+    })
+})
