@@ -1,0 +1,26 @@
+25 February 2026 — Commits and changes
+
+- c634f80 (Arvish Doshi) 2026-02-25 23:05:47 +0530
+  - Subject: Event acknowledgement & Profanity check
+  - Files changed:
+    - package.json
+    - public/js/chat.js
+    - src/index.js
+
+- 9aea9b4 (Arvish Doshi) 2026-02-25 22:33:44 +0530
+  - Subject: Merge pull request #7 from arvishcdoshi/location-sharing
+  - Files changed: (merge commit)
+
+- 07449e4 (Arvish Doshi) 2026-02-25 22:33:09 +0530
+  - Subject: Geolocation sharing using the browser API
+  - Files changed:
+    - public/index.html
+    - public/js/chat.js
+    - src/index.js
+
+Summary of today's work:
+- Added geolocation sharing support (client + server updates).
+- Integrated event acknowledgement and profanity check changes; updated package.json and chat client logic.
+- Reworked server to expose an explicit http.Server instance for WebSocket integration and added explanatory comments in src/index.js.
+
+--- End of 25 February 2026 entry ---
