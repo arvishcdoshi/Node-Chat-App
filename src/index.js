@@ -3,6 +3,7 @@ const http = require('http')
 const express = require('express')
 const socketio = require('socket.io')
 const Filter = require('bad-words')
+const { generateMessage } = require('./utils/messages')
 
 const app = express()
 
@@ -41,10 +42,10 @@ app.use(express.static(publicDirectoryPath))
 io.on('connection', (socket) => {
   console.log('New WebSocket connection')
 
-  socket.emit('message', 'Welcome!')
+  socket.emit('message', generateMessage('Welcome!'))
 
  // socket.broadcast.emit emits an event to every single connection except for the one that triggered the event.
-  socket.broadcast.emit('message', 'A new user has joined!')
+  socket.broadcast.emit('message', generateMessage('A new user has joined!'))
 
   socket.on('sendMessage', (message, callback) => {
     const filter = new Filter()
@@ -53,14 +54,14 @@ io.on('connection', (socket) => {
       return callback('Profanity is not allowed!')
     }
     // We want to broadcast this message to every single connection that is currently connected to our server.
-    io.emit('message', message)
+    io.emit('message', generateMessage(message))
     // This is the acknowledgement callback function that we are calling in the client. So when the client emits the sendMessage event, it can pass in a callback function as the third argument and this function will be called when the server acknowledges that it has received the message.
     callback()
   })
 
   // socket.on is used to listen for an event. So in this case, we are listening for the disconnect event, which is built into Socket.IO and it fires when a client disconnects from our server.
   socket.on('disconnect', () => {
-    io.emit('message', 'A user has left!')
+    io.emit('message', generateMessage('A user has left!'))
   })
 
   socket.on('sendLocation', (coords, callback) => {
