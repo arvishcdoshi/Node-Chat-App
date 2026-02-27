@@ -42,10 +42,25 @@ app.use(express.static(publicDirectoryPath))
 io.on('connection', (socket) => {
   console.log('New WebSocket connection')
 
-  socket.emit('message', generateMessage('Welcome!'))
-
+  // socket.emit('message', generateMessage('Welcome!'))
  // socket.broadcast.emit emits an event to every single connection except for the one that triggered the event.
-  socket.broadcast.emit('message', generateMessage('A new user has joined!'))
+  // socket.broadcast.emit('message', generateMessage('A new user has joined!'))
+
+  socket.on('join', ({ username, room }) => {
+
+    console.log(username, room)
+    // socket.join is used to join a specific room. So when a client emits the join event, we can use socket.join to join that client to a specific room. Then we can use io.to.emit to emit an event to every single connection that is currently in that room.
+    // socket.join can only be used on the server, it cannot be used on the client.
+    socket.join(room)
+
+    // socket.emit, io.emit, socket.broadcast.emit
+    // io.to.emit, socket.broadcast.to.emit
+
+    socket.emit('message', generateMessage('Welcome!'))
+    socket.broadcast.to(room).emit('message', generateMessage(`${username} has joined!`))
+
+
+  })
 
   socket.on('sendMessage', (message, callback) => {
     const filter = new Filter()
