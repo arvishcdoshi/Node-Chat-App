@@ -2,6 +2,7 @@
 // and we are getting back a socket object that represents the connection between the client and the server.
 // We can use this socket object to send and receive data from the server.
 const socket = io()
+const qs = Qs
 
 
 // Elements
@@ -14,6 +15,10 @@ const $messages = document.querySelector('#messages')
 // Templates
 const messageTemplate = document.querySelector('#message-template').innerHTML
 const locationMessageTemplate = document.querySelector('#location-message-template').innerHTML
+
+
+// Options
+const { username, room } = qs.parse(location.search, { ignoreQueryPrefix: true })
 
 
 // socket.on('countUpdated', (count) => {
@@ -91,4 +96,11 @@ $sendLocationButton.addEventListener('click', () => {
             console.log('Location delivered!')
         })
     })
+})
+
+socket.emit('join', { username, room }, (error) => {
+    if (error) {
+        alert(error)
+        location.href = '/'
+    }
 })
