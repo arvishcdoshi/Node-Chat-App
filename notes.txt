@@ -80,3 +80,19 @@ Socket.IO notes (quick reference)
   - Add user join/leave messages (broadcast on connect/disconnect).
   - Add simple validation and rate-limiting for messages.
   - Track connected users in a server-side map for presence.
+
+
+const addUser = ({ id, username, room }) => {
+  // Clean the data
+  username = username.trim().toLowerCase()
+  room = room.trim().toLowerCase()
+
+  // Validate the data
+  if (!username || !room) {
+    return {
+      error: 'Username and room are required!'
+    }
+  }
+
+// Here, id=socketId
+So we can use this socket id to identify the user that is associated with that connection. So when a client connects to our server, we can use the socket id to identify that client and then we can store the username and the room that they are in along with the socket id in our users array. Then when a client disconnects from our server, we can use the socket id to remove that user from our users array. And then when a client emits a message, we can use the socket id to identify which user is sending the message and then we can broadcast that message to every single connection that is currently in the same room as that user.
