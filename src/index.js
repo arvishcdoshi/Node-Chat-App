@@ -4,6 +4,7 @@ const express = require('express')
 const socketio = require('socket.io')
 const Filter = require('bad-words')
 const { generateMessage, generateLocationMessage } = require('./utils/messages')
+const { addUser, removeUser, getUser, getUsersInRoom } = require('./utils/users')
 
 const app = express()
 
@@ -46,19 +47,25 @@ io.on('connection', (socket) => {
  // socket.broadcast.emit emits an event to every single connection except for the one that triggered the event.
   // socket.broadcast.emit('message', generateMessage('A new user has joined!'))
 
-  socket.on('join', ({ username, room }) => {
+  socket.on('join', ({ username, room }, callback) => {
 
-    console.log(username, room)
+    const { error, user } = addUser({ id: socket.id, username, room })
+
+    if (error) {
+      return callback(error)
+    }
+
     // socket.join is used to join a specific room. So when a client emits the join event, we can use socket.join to join that client to a specific room. Then we can use io.to.emit to emit an event to every single connection that is currently in that room.
     // socket.join can only be used on the server, it cannot be used on the client.
-    socket.join(room)
+    socket.join(user.room)
 
     // socket.emit, io.emit, socket.broadcast.emit
     // io.to.emit, socket.broadcast.to.emit
 
     socket.emit('message', generateMessage('Welcome!'))
-    socket.broadcast.to(room).emit('message', generateMessage(`${username} has joined!`))
+    socket.broadcast.to(user.room).emit('message', generateMessage(`${user.username} has joined!`))
 
+    callback()
 
   })
 
@@ -76,7 +83,12 @@ io.on('connection', (socket) => {
 
   // socket.on is used to listen for an event. So in this case, we are listening for the disconnect event, which is built into Socket.IO and it fires when a client disconnects from our server.
   socket.on('disconnect', () => {
-    io.emit('message', generateMessage('A user has left!'))
+    const user = removeUser(socket.id)
+
+    if (user) {
+      io.to(user.room).emit('message', generateMessage(`${user.username} has left!`))
+    }
+
   })
 
   socket.on('sendLocation', (coords, callback) => {
