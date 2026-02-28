@@ -96,3 +96,6 @@ const addUser = ({ id, username, room }) => {
 
 // Here, id=socketId
 So we can use this socket id to identify the user that is associated with that connection. So when a client connects to our server, we can use the socket id to identify that client and then we can store the username and the room that they are in along with the socket id in our users array. Then when a client disconnects from our server, we can use the socket id to remove that user from our users array. And then when a client emits a message, we can use the socket id to identify which user is sending the message and then we can broadcast that message to every single connection that is currently in the same room as that user.
+
+More on Socket.IO
+https://stackoverflow.com/questions/32674391/io-emit-vs-socket-emit

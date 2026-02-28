@@ -15,7 +15,7 @@ const $messages = document.querySelector('#messages')
 // Templates
 const messageTemplate = document.querySelector('#message-template').innerHTML
 const locationMessageTemplate = document.querySelector('#location-message-template').innerHTML
-
+const sidebarTemplate = document.querySelector('#sidebar-template').innerHTML
 
 // Options
 const { username, room } = qs.parse(location.search, { ignoreQueryPrefix: true })
@@ -47,7 +47,22 @@ socket.on('locationMessage', (message) => {
         url: message.url,
         createdAt: moment(message.createdAt).format('h:mm a')
     })
+    // We are using insertAdjacentHTML to add the new message to the end of the messages container. So we are passing in 'beforeend' as the first argument to insertAdjacentHTML, which means that we want to insert the new message before the end of the messages container.
     $messages.insertAdjacentHTML('beforeend', html)
+})
+
+socket.on('roomData', ({ room, users }) => {
+    const html = Mustache.render(sidebarTemplate, {
+        room,
+        users
+    })
+    // We want to update the sidebar with the new list of users in the room and the name of the room. So we are rendering the sidebar template with the new data and then we are setting the innerHTML of the sidebar element to the rendered HTML.
+    document.querySelector('#sidebar').innerHTML = html
+
+})
+
+socket.on('countUpdated', (count) => {
+  console.log('The count has been updated!', count)
 })
 
 document.querySelector('#message-form').addEventListener('submit', (e) => {
